@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WidgetOvalButton">
+        <attr name="bt_ico" format="reference" />
+        <attr name="bt_text" format="string" />
+        <attr name="bt_text_size" format="dimension" />
+        <attr name="bt_text_color" format="color" />
+        <attr name="bt_color_down" format="color" />
+        <attr name="bt_color" format="color" />
+        <attr name="bt_stroke_color" format="color" />
+        <attr name="bt_stroke_width" format="dimension" />
+        <attr name="bt_corner_radius" format="dimension" />
+        <attr name="bt_ico_marginLeft" format="dimension" />
+        <attr name="bt_text_marginRight" format="dimension" />
+    </declare-styleable>
+</resources>

@@ -77,7 +77,7 @@ public class BarrierAnimation extends BaseView {
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-                mRectH = 700 + (int) (Math.random() * 200);
+                mRectH = 200 + (int) (Math.random() * 200);
                 mRectW = 100 + (int) (Math.random() * 200);
             }
         });

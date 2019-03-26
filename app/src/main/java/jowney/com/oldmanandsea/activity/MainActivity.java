@@ -1,8 +1,10 @@
 package jowney.com.oldmanandsea.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import jowney.com.common.util.AudioRecordUtils;
 import jowney.com.common.util.SoundPoolUtils;
 import jowney.com.oldmanandsea.R;
 import jowney.com.oldmanandsea.view.BarrierAnimation;
@@ -12,7 +14,7 @@ public class MainActivity extends BaseActivity {
     private static final String TAG = "wxy";
     BarrierAnimation mBarrierAnimation;
     WaveAnimation mWaveAnimation;
-
+    String mGameMode;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,7 +24,8 @@ public class MainActivity extends BaseActivity {
         mWaveAnimation.setBarrier(mBarrierAnimation);
         SoundPoolUtils.getInstance().playSound("rain_sound", -1);
         SoundPoolUtils.getInstance().playSound("thunder_sound", -1);
-        Log.i(TAG, "onCreate: ");
+        Intent intent = getIntent();
+         mGameMode = intent.getStringExtra("mode");
     }
 
     @Override
@@ -42,6 +45,7 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         Log.i(TAG, "onResume: ");
         super.onResume();
+
 
     }
 

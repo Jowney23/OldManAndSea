@@ -15,7 +15,8 @@
     <jowney.com.oldmanandsea.view.WaveAnimation
         android:id="@+id/wave"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:clickable="true"/>
 
     <jowney.com.oldmanandsea.view.CloudAnimation
         android:id="@+id/cloud"

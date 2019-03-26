@@ -9,9 +9,11 @@ import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
+import jowney.com.common.util.AudioRecordUtils;
 import jowney.com.oldmanandsea.dialog.GameOverDialog;
 
 /**
@@ -22,7 +24,7 @@ import jowney.com.oldmanandsea.dialog.GameOverDialog;
 public class WaveAnimation extends View {
     private static final String TAG = "WaveBezier";
     private final int CIRCLE_R = 100;
-    private final int WAVE_LENGHT = 1000;
+    private final int WAVE_LENGHT = 800;
     private float[] mWavePos;
     private float[] temporay = new float[2];
     private float[] tan;
@@ -30,6 +32,7 @@ public class WaveAnimation extends View {
     private int mScreenWidth;
     private int mOffset;
     private int mWaveCount;
+    private int mLastVoiceValue;
     private int mCenterY;
     private Paint mPathPaint;
     private Paint mCirclePaint;
@@ -37,6 +40,8 @@ public class WaveAnimation extends View {
     private PathMeasure mWavePathMeasure;
     private BarrierAnimation mBarrierView;
     private CloudAnimation mCloudView;
+    private Boolean isDown = false;
+    private int mWaveHeightOffset;
     ValueAnimator mAnimator;
 
     public WaveAnimation(Context context) {
@@ -55,6 +60,18 @@ public class WaveAnimation extends View {
         tan = new float[2];
         mWavePath = new Path();
         mWavePathMeasure = new PathMeasure();
+        AudioRecordUtils.getInstance().startAudioRecord(new AudioRecordUtils.OnVoiceValueListener() {
+            @Override
+            public void onVoiceValue(int value) {
+                if (value > 40) {
+                    mWaveHeightOffset -= 10;
+                } else {
+                    mWaveHeightOffset += 20;
+                }
+                mLastVoiceValue = value ;
+                Log.d(TAG, "onVoiceValue: ++++++++++++++++++" + mLastVoiceValue);
+            }
+        });
 
     }
 
@@ -72,7 +89,7 @@ public class WaveAnimation extends View {
         mScreenHeight = h;
         mScreenWidth = w;
         mWaveCount = (int) Math.round(mScreenWidth / WAVE_LENGHT + 1.5);
-        mCenterY = mScreenHeight / 2;
+        mCenterY = mScreenHeight / 3;
         mAnimator = ValueAnimator.ofInt(0, WAVE_LENGHT);
         mAnimator.setDuration(4000);
         mAnimator.setRepeatCount(ValueAnimator.INFINITE);
@@ -91,14 +108,19 @@ public class WaveAnimation extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         mWavePath.reset();
-        mWavePath.moveTo(-WAVE_LENGHT + mOffset, mCenterY);
+       /* if (isDown){
+            mWaveHeightOffset -= 5;
+        }else {
+            mWaveHeightOffset +=5;
+        }*/
+        mWavePath.moveTo(-WAVE_LENGHT + mOffset, mCenterY + mWaveHeightOffset);
         for (int i = 0; i < mWaveCount; i++) {
-            mWavePath.quadTo((-WAVE_LENGHT * 3 / 4) + (i * WAVE_LENGHT) + mOffset, mCenterY + 160, (-WAVE_LENGHT / 2) + (i * WAVE_LENGHT) + mOffset, mCenterY);
-            mWavePath.quadTo((-WAVE_LENGHT / 4) + (i * WAVE_LENGHT) + mOffset, mCenterY - 160, i * WAVE_LENGHT + mOffset, mCenterY);
+            mWavePath.quadTo((-WAVE_LENGHT * 3 / 4) + (i * WAVE_LENGHT) + mOffset, mCenterY + mWaveHeightOffset + 160, (-WAVE_LENGHT / 2) + (i * WAVE_LENGHT) + mOffset, mCenterY + mWaveHeightOffset);
+            mWavePath.quadTo((-WAVE_LENGHT / 4) + (i * WAVE_LENGHT) + mOffset, mCenterY + mWaveHeightOffset - 160, i * WAVE_LENGHT + mOffset, mCenterY + mWaveHeightOffset);
         }
         mWavePathMeasure.setPath(mWavePath, false);
         float wavePerimeter = mWavePathMeasure.getLength() / (float) mWaveCount;
-        float waveOffset = wavePerimeter / 1000;
+        float waveOffset = wavePerimeter / WAVE_LENGHT;
         mWavePath.lineTo(mScreenWidth, mScreenHeight);
         mWavePath.lineTo(0, mScreenHeight);
         mWavePath.close();
@@ -106,13 +128,29 @@ public class WaveAnimation extends View {
         mWavePathMeasure.getPosTan(1500 - mOffset * waveOffset, mWavePos, tan);
         canvas.drawCircle(mWavePos[0], mWavePos[1], CIRCLE_R, mCirclePaint);
         canvas.drawPath(mWavePath, mPathPaint);
-        if (judgeImpact()){
+        if (judgeImpact()) {
             GameOverDialog gameOverDialog = new GameOverDialog(getContext());
             gameOverDialog.show();
             mAnimator.cancel();
             mBarrierView.mValueAnimator.cancel();
         }
 
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Log.d(TAG, "onTouchEvent: 点击");
+                isDown = true;
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.d(TAG, "onTouchEvent: 抬起");
+                isDown = false;
+                break;
+
+        }
+        return super.onTouchEvent(event);
     }
 
     private Boolean judgeImpact() {
