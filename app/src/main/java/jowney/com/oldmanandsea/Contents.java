@@ -8,4 +8,5 @@ package jowney.com.oldmanandsea;
 public class Contents {
     public static final String CLICK_MODE = "CLICK_MODE";
     public static final String SOUND_MODE = "SOUND_MODE";
+    
 }
